@@ -1,6 +1,20 @@
 services:
+  # Reverse Proxy Gateway
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'   # Public HTTP Port (Required for Let's Encrypt validation)
+      - '443:443' # Public HTTPS Port
+      - '81:81'   # Admin Web UI Port
+    volumes:
+      - ~/seedbox/config/nginx:/data
+      - ~/seedbox/config/nginx/letsencrypt:/etc/letsencrypt
+    networks:
+      - seedbox-net
 
-  # BitTorrent Client (qBittorrent with Web UI)
+  # BitTorrent Client
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -13,23 +27,30 @@ services:
       - ~/seedbox/config/qbittorrent:/config
       - ~/seedbox/data:/data
     ports:
-      - 8080:8080
       - 6881:6881
       - 6881:6881/udp
+      # Port 8080 is removed from public binding since traffic goes through Nginx
+    networks:
+      - seedbox-net
     restart: unless-stopped
 
   # Plex Media Server
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    network_mode: host
+    network_mode: host # Host mode bypasses standard bridge networking for easier local routing
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
       - VERSION=docker
-      - PLEX_CLAIM=YOUR_CLAIM_CODE_HERE  # Get from plex.tv/claim
+      - PLEX_CLAIM=YOUR_CLAIM_CODE
     volumes:
       - ~/seedbox/config/plex:/config
       - ~/seedbox/data/media:/data/media
     restart: unless-stopped
+    # Plex manages its own network bindings in host mode, so it doesn't need to join seedbox-net explicitly
+
+networks:
+  seedbox-net:
+    driver: bridge
