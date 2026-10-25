@@ -38,13 +38,15 @@ services:
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
-    network_mode: host # Host mode bypasses standard bridge networking for easier local routing
+    network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Etc/UTC
       - VERSION=docker
       - PLEX_CLAIM=YOUR_CLAIM_CODE
+      # Tell Plex to use your custom secure subdomain instead of the host name
+      - ADVERTISE_IP=https://plexsubdomain.yourdomain.com
     volumes:
       - ~/seedbox/config/plex:/config
       - ~/seedbox/data/media:/data/media
