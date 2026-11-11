@@ -1,58 +1,44 @@
 services:
-  # Reverse Proxy Gateway
   nginx-proxy-manager:
     image: 'jc21/nginx-proxy-manager:latest'
     container_name: nginx-proxy-manager
     restart: unless-stopped
     ports:
-      - '80:80'   # Public HTTP Port (Required for Let's Encrypt validation)
-      - '443:443' # Public HTTPS Port
-      - '81:81'   # Admin Web UI Port
+      - '80:80'
+      - '81:81'
+      - '443:443'
     volumes:
-      - ~/seedbox/config/nginx:/data
-      - ~/seedbox/config/nginx/letsencrypt:/etc/letsencrypt
-    networks:
-      - seedbox-net
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
 
-  # BitTorrent Client
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - WEBUI_PORT=8080
-    volumes:
-      - ~/seedbox/config/qbittorrent:/config
-      - ~/seedbox/data:/data
-    ports:
-      - 6881:6881
-      - 6881:6881/udp
-      # Port 8080 is removed from public binding since traffic goes through Nginx
-    networks:
-      - seedbox-net
-    restart: unless-stopped
-
-  # Plex Media Server
   plex:
     image: lscr.io/linuxserver/plex:latest
     container_name: plex
+    restart: unless-stopped
     network_mode: host
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=America/Detroit
       - VERSION=docker
-      - PLEX_CLAIM=YOUR_CLAIM_CODE
-      # Tell Plex to use your custom secure subdomain instead of the host name
-      - ADVERTISE_IP=https://plexsubdomain.yourdomain.com
+      - PLEX_CLAIM=your_plex_claim_token_here # Get from plex.tv/claim
     volumes:
-      - ~/seedbox/config/plex:/config
-      - ~/seedbox/data/media:/data/media
-    restart: unless-stopped
-    # Plex manages its own network bindings in host mode, so it doesn't need to join seedbox-net explicitly
+      - ./plex/config:/config
+      - ./media/downloads/completed:/data/media
 
-networks:
-  seedbox-net:
-    driver: bridge
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    ports:
+      - '8443:8443'
+      - '6881:6881'
+      - '6881:6881/udp'
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Detroit
+      - WEBUI_PORT=8443
+    volumes:
+      - ./qbittorrent/config:/config
+      - ./media/downloads:/data
