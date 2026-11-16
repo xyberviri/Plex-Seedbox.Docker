@@ -1,33 +1,39 @@
-# Plex-Seedbox.Docker
+Plex-Seedbox.Docker
 Docker config for a Seedbox with Plex
 
-Install Docker
+# Install Docker
 ```
 https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
 ```
-Add user to docker group
+# Add user to docker group
 ```
 https://docs.docker.com/engine/install/linux-postinstall
 ```
 
-Create the Directory structure
+# Create the Directory structure
 ```
-mkdir -p ~/seedbox/config/qbittorrent
-mkdir -p ~/seedbox/config/plex
-mkdir -p ~/seedbox/data/torrents
-mkdir -p ~/seedbox/data/media/movies
-mkdir -p ~/seedbox/data/media/tv
+mkdir seedbox
+cd seedbox
+
+mkdir -p npm/data npm/letsencrypt plex/config qbittorrent/config media/downloads/completed
+chown -R $USER:$USER npm plex qbittorrent media
 ```
-Create the docker compose
+#Create the docker compose
 ```
 cd ~/seedbox/
 wget https://raw.githubusercontent.com/xyberviri/Plex-Seedbox.Docker/refs/heads/main/docker-compose.yml
 ```
-Generate a Plex Claim Code
+
+# Pull Docker Images
+```
+#pull docker images
+docker compose pull
+```
+# Generate a Plex Claim Code
 ```
 https://account.plex.tv/claim
 ```
-NOTE: you have 4 minutes to bring the box up after this
+`NOTE: you have 4 minutes to bring the box up after this`
 
 Edit the docker config and replace `YOUR_CLAIM_CODE_HERE` with the code you generated in the previous step
 
