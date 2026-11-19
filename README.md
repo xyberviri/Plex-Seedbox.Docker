@@ -1,6 +1,3 @@
-Plex-Seedbox.Docker
-Docker config for a Seedbox with Plex
-
 # Install Docker
 ```
 https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
