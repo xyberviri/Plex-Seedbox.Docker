@@ -193,3 +193,7 @@ Get the temp admin password
 ```
 docker logs qbittorrent
 ```
+# Updating docker images
+1. Pull the new images `docker compose pull`
+2. Stop the containers `docker compose down`
+3. Start the containers `docker compose up -d`
